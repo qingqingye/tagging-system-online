@@ -1,5 +1,6 @@
 // JS file for bounding box internals
 
+
 class BoundingBoxes {
   constructor(annotationTypeId, noSelection) {
     this.initialized = false;

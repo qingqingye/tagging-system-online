@@ -131,10 +131,15 @@
                         <p>
                           <select id="annotation_type_id" name="selected_annotation_type" class="form-control">
                               <option value="-1">{% trans 'Annotation Type' %}</option>
-                              {% for key,value in project.items %}
-                              <option value="{{ value }}" hassubinfo="true">{{ key }}</option>
+{#                              {% for key,value in project.items %}#}
+{#                              <option value="{{ value }}" hassubinfo="true">{{ key }}</option>#}
+{#                              {% endfor %}#}
+
+                              {% for obj in obj_list %}
+                                  <option value ="{{ forloop.counter }}">{{ obj }}</option>
                               {% endfor %}
                           </select>
+
                         </p>
                         <p>
                           <input type='checkbox' id='draw_annotations' name="draw_annotations" checked>
