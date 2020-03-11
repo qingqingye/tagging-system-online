@@ -1,0 +1,288 @@
+{% extends 'base/base.html' %}
+{% load widget_tweaks %}
+
+{% block bodyblock %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Messages</h1>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="list-group">
+                        <a class="list-group-item {% if mode == 'unread' %} active{% endif %}" href="{% url 'tagger_messages:overview_unread' %}">Unread messages</a>
+                        <a class="list-group-item {% if mode == 'all' %} active{% endif %}" href="{% url 'tagger_messages:overview_all' %}">All messages</a>
+                        {% if user_has_admin_teams %}
+                        <a class="list-group-item {% if mode == 'sent_active' or mode == 'sent_hidden' %} active{% endif %}" href="{% url 'tagger_messages:overview_sent' %}">Sent messages</a>
+                        {% endif %}
+                        <a class="list-group-item {% if mode == 'global_active' or mode == 'global_hidden' %} active{% endif %}" href="{% url 'tagger_messages:overview_global' %}">Global announcements</a>
+                    </div>
+                    {% if user_has_admin_teams and team_message_creation_form %}
+                    <div style="float: left; margin-right:1em;">
+                        <input name="create_message1" class="btn btn-default" value="New Message" data-toggle="modal" data-target="#newMessageModal" type="button">
+                    </div>
+                    {% endif %}
+                    {% if user.is_staff and global_message_creation_form %}
+                    <div style="float: left; margin-right:1em;">
+                        <input name="create_ga" class="btn btn-default" value="New Global Announcement" data-toggle="modal" data-target="#newGlobalAnnouncementModal" type="button">
+                    </div>
+                    {% endif %}
+                    {% if mode != 'global_active' and mode != 'global_hidden' %}
+                    <form method="post" style="margin: 0px" class="form-inline" action="{% url 'tagger_messages:read_all_messages'  %}">
+                        {% csrf_token %}
+                        <input class="btn btn-default" type="submit" value="Mark all as read" type="button">
+                    </form>
+                    {% endif %}
+                </div>
+                <div class="col-md-9">
+                    {% if mode == 'sent_active' or mode == 'sent_hidden' %}
+                    <ul class="nav nav-tabs" style="margin-bottom:1em;">
+                        <li class="{% if mode == 'sent_active' %}active{% endif %}" role="presentation">
+                            <a href="{% url 'tagger_messages:overview_sent_active' %}">Active Messages</a>
+                        </li>
+                        <li class="{% if mode == 'sent_hidden' %}active{% endif %}" role="presentation">
+                            <a href="{% url 'tagger_messages:overview_sent_hidden' %}">Hidden Messages</a>
+                        </li>
+                    </ul>
+                    {% endif %}
+                    {% for message in usermessages %}
+                    <div class="panel panel-default">
+                        <div class="panel-heading" {% if not user in message.read_by.all %} style="font-weight: bold;" {% endif %} >
+                                {{message.creator}}: {{message.title}}
+                            <div class="pull-right">
+                                {% if user == message.creator or user.is_staff %}
+                                <form method="post" class="form-inline" style="margin: 0px; margin-left: 1em;" action="{% url 'tagger_messages:delete_message' message.id %}">
+                                        {% csrf_token %}
+                                        <button class="btn btn-link" style="padding: 0px;" type="submit" data-toggle="tooltip" data-placement="bottom" title="Delete message">
+                                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span></span>
+                                    </button>
+                                </form>
+                                {% endif %}
+                                {% if not user in message.read_by.all %}
+                                <form method="post" class="form-inline" style="margin: 0px; margin-left: 1em;" action="{% url 'tagger_messages:read_message' message.id %}">
+                                        {% csrf_token %}
+                                        <button class="btn btn-link" style="padding: 0px;" type="submit" data-toggle="tooltip" data-placement="bottom" title="Mark message as read">
+                                                <span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span>
+                                            </button>
+                                        </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <p>{{message.content}}</p>
+                            <hr style="margin-bottom: 0.8em">
+                            <sub class="pull-left">
+                                {{message.team}}
+                            </sub>
+                            <sub class="pull-right">
+                                {% if mode != 'sent_hidden' %}
+                                {{message.start_time}}
+                                {% else %}
+                                [Out of range] {{message.start_time}} to {{message.expire_time}}
+                                {% endif %}
+                            </sub>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% if usermessages %}
+                    <div class="pagination">
+                        <span class="step-links">
+                            <div class="btn-group" role="group" aria-label="btn-group">
+                                {% if usermessages.has_previous %}
+                                    <a class="btn btn-default" href="?page=1">&laquo; first</a>
+                                    <a class="btn btn-default" href="?page={{ usermessages.previous_page_number }}">previous</a>
+                                {% endif %}
+                                {% if usermessages.has_other_pages %}
+                                    <span class="current btn btn-default">
+                                        Page {{ usermessages.number }} of {{ usermessages.paginator.num_pages }}
+                                    </span>
+                                {% endif %}
+                                {% if usermessages.has_next %}
+                                    <a class="btn btn-default" href="?page={{ usermessages.next_page_number }}">next</a>
+                                    <a class="btn btn-default" href="?page={{ usermessages.paginator.num_pages }}">last &raquo;</a>
+                                {% endif %}
+                            </div>
+                        </span>
+                    </div>
+                    {% endif %}
+                    {% if user.is_staff %}
+                    {% if mode == 'global_active' or mode == 'global_hidden' %}
+                    <ul class="nav nav-tabs" style="margin-bottom:1em;">
+                        <li class="{% if mode == 'global_active' %}active{% endif %}" role="presentation">
+                            <a href="{% url 'tagger_messages:overview_global_active' %}">Active Annoucements</a>
+                        </li>
+                        <li class="{% if mode == 'global_hidden' %}active{% endif %}" role="presentation">
+                            <a href="{% url 'tagger_messages:overview_global_hidden' %}">Hidden Annoucements</a>
+                        </li>
+                    </ul>
+                    {% endif %}
+                    {% endif %}
+                    {% for message in global_annoucements %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <div class="panel-title">
+                                        {{message.title}}
+                                        <div class="pull-right">
+                                            {% if user == message.creator %}
+                                            <form method="post" class="form-inline" action="{% url 'tagger_messages:delete_message' message.id %}">
+                                                {% csrf_token %}
+                                                <button class="btn btn-link" style="padding: 0px;" type="submit" data-toggle="tooltip" data-placement="bottom" title="Delete message">
+                                                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span></span>
+                                                </button>
+                                            </form>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel-body">
+                                    {{message.content}}
+                                    <hr style="margin-bottom: 0.8em">
+                                    <sub class="pull-left">
+                                        {{message.creator}}
+                                    </sub>
+                                    <sub class="pull-right">
+                                        {% if mode != 'global_hidden' %}
+                                        {{message.start_time}}
+                                        {% else %}
+                                        [Out of range] {{message.start_time}} to {{message.expire_time}}
+                                        {% endif %}
+                                    </sub>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% if global_annoucements %}
+                    <div class="pagination">
+                        <span class="step-links">
+                            <div class="btn-group" role="group" aria-label="btn-group">
+                                {% if global_annoucements.has_previous %}
+                                    <a class="btn btn-default" href="?page=1">&laquo; first</a>
+                                    <a class="btn btn-default" href="?page={{ global_annoucements.previous_page_number }}">previous</a>
+                                {% endif %}
+                                {% if global_annoucements.has_other_pages %}
+                                    <span class="current btn btn-default">
+                                        Page {{ global_annoucements.number }} of {{ global_annoucements.paginator.num_pages }}
+                                    </span>
+                                {% endif %}
+                                {% if global_annoucements.has_next %}
+                                    <a class="btn btn-default" href="?page={{ global_annoucements.next_page_number }}">next</a>
+                                    <a class="btn btn-default" href="?page={{ global_annoucements.paginator.num_pages }}">last &raquo;</a>
+                                {% endif %}
+                            </div>
+                        </span>
+                    </div>
+                    {% endif %}
+                    {% if not usermessages and not global_annoucements %}
+                    <div class="alert alert-info" role="alert">
+                        There are no
+                        {% if mode == 'unread' %}
+                            unread
+                        {% endif %}
+                            {% if global_message_creation_form %}
+                            global annoucements.
+                            {% else %}
+                            messages.
+                            {% endif %}                              
+                    {% if user_has_admin_teams and mode != 'unread' and not global_message_creation_form %}
+                    <input name="create_message2" class="btn btn-default pull-right" style="margin-top: -0.5em" value="Create One" data-toggle="modal" data-target="#newMessageModal" type="button">
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% if team_message_creation_form %}
+<div class="modal fade" id="newMessageModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" action="{% url 'tagger_messages:send_team_message' %}">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">New Message</h4>
+            </div>
+            <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="id_title">{{ team_message_creation_form.title.label }}: </label>
+                        {% render_field team_message_creation_form.title class+='form-control' placeholder=team_message_creation_form.title.label %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_content">{{ team_message_creation_form.content.label }}: </label>
+                        {% render_field team_message_creation_form.content class+='form-control' placeholder=team_message_creation_form.content.label %}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_team">{{ team_message_creation_form.team.label }}: </label>
+                        {% render_field team_message_creation_form.team class+='form-control'%}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_start_time">{{ team_message_creation_form.start_time.label }}: </label>
+                        {% render_field team_message_creation_form.start_time class+='form-control' type='date'%}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_expire_time">{{ team_message_creation_form.expire_time.label }}: </label>
+                        {% render_field team_message_creation_form.expire_time class+='form-control' type='date'%}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_admins_only">{{ team_message_creation_form.admins_only.label }}: </label>
+                        {% render_field team_message_creation_form.admins_only %}
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button class="btn btn-primary" type="submit">Send</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% if global_message_creation_form %}
+<div class="modal fade" id="newGlobalAnnouncementModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <form method="post" action="{% url 'tagger_messages:send_global_message' %}">
+            <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">New global announcement</h4>
+            </div>
+            <div class="modal-body">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="id_title">{{ global_message_creation_form.title.label }}: </label>
+                    {% render_field global_message_creation_form.title class+='form-control' placeholder=global_message_creation_form.title.label %}
+                </div>
+                <div class="form-group">
+                    <label for="id_content">Content: </label>
+                    {% render_field global_message_creation_form.content class+='form-control' placeholder=global_message_creation_form.content.label %}
+                </div>
+                <div class="form-group">
+                    <label for="id_start_time">Start time: </label>
+                    {% render_field global_message_creation_form.start_time class+='form-control' type='date'%}
+                </div>
+                <div class="form-group">
+                    <label for="id_expire_time">Expire time: </label>
+                    {% render_field global_message_creation_form.expire_time class+='form-control' type='date'%}
+                </div>
+                <div class="form-group">
+                    <label for="id_team_admins_only">Team admins only: </label>
+                    {% render_field global_message_creation_form.team_admins_only %}
+                </div>
+                <div class="form-group">
+                    <label for="id_staff_only">Staff only: </label>
+                    {% render_field global_message_creation_form.team_admins_only %}
+                </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button class="btn btn-primary" type="submit">Send</button>
+            </div>
+        </form>
+    </div>
+ </div>
+</div>
+{% endif %}
+{% endblock %}

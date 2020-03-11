@@ -1,0 +1,262 @@
+.content{
+  padding-top: 60px;
+}
+.checkbox{
+  border-radius: 3px;
+  border-color: silver;
+  border-style: solid;
+  border-width: thin;
+  text-align: left;
+  font-size: 15px;
+  width: auto;
+}
+div.wrapper{
+  position: relative;
+}
+
+div.panel-heading {
+  word-wrap:break-word;
+}
+
+.boundingBox{
+  position: absolute;
+  border:2px solid #ff0000;
+  background-color: transparent;
+}
+
+#image_list, #annotation_list {
+  height: 600px;
+  overflow-y: scroll;
+}
+
+#annotation_type_select {
+  width: 100%;
+}
+
+div.annotation{
+  border-radius: 5px;
+  border-color: silver;
+  border-style: solid;
+  border-width: thin;
+  padding: 5px;
+  margin-top: 5px;
+}
+
+#additional_feature_table{
+  width: 90%;
+}
+
+a.bitbot-logo{
+  padding-top: 5px;
+}
+
+.team-table {
+  margin-top: 1em;
+}
+
+.team-table td {
+  padding: 0 0.3em 0 0;
+}
+
+.team-table td:nth-of-type(2), .team-table td:nth-of-type(3) {
+  text-align: right;
+    width: 10em;
+}
+
+.form-inline {
+  margin-left: -0.8em;
+  display: inline;
+}
+
+.align-right {
+  text-align: right;
+}
+
+.js_feedback {
+  position: fixed;
+  top: 5px;
+  left: 0;
+  right: 0;
+  width: 50em;
+  margin: auto;
+
+  text-align: center;
+
+  z-index: 10000;
+}
+
+#image_col {
+  position: relative;
+}
+
+#image_canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#image {
+  width: 100%;
+}
+
+.annotate_image_link {
+  display: block;
+}
+
+.annotate_image_link.active, .annotate_image_link.active:active,
+.annotate_image_link.active:hover, .annotation_link.active,
+.annotation_link.active:active, .annotation_link.active:hover {
+  color: black;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+#edit_active {
+  position: absolute;
+  top: 0.7em;
+  left: 0;
+  right: 0;
+  width: 30em;
+  height: 3.5em;
+  margin: auto;
+
+  z-index: 9999;
+}
+
+#edit_active p {
+  float: left;
+}
+
+#edit_active button {
+  float: right;
+
+  margin-top: -0.55em;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+table#coordinate_table tr td:nth-of-type(1) {
+  width: 3.5em;
+}
+
+.annotation-filter {
+  padding: 3px;
+}
+
+.annotation-filter .form-control, .set-search .form-control {
+  width: 50%;
+}
+
+.delete-annotations {
+  float: right;
+  align: right;
+  margin: 3px;
+}
+
+input.form-control[type="checkbox"] {
+  height: auto;
+}
+
+.tag-delete {
+  cursor: pointer;
+}
+
+.tag-container > span, .tag-container > a {
+  margin: 2px;
+}
+
+.upper-bandage {
+  padding: 1px 3px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size : 70%;
+  background-color : red;
+}
+
+.upper-bandage-parent {
+  position: absolute; 
+  top: 50%; 
+  transform: translateY(-50%);
+  display: inline-block;
+  position: relative;
+  padding: 3px 10px;
+  color: #777;
+  text-decoration: none;
+}
+
+.upper-bandage-parent:hover {
+  color: #333;
+  text-decoration: none;
+}
+
+
+
+/* Autocomplete (from https://www.devbridge.com/sourcery/components/jquery-autocomplete/) */
+.autocomplete-suggestions {
+  border: 1px solid #999;
+  background: #FFF;
+  overflow: auto;
+}
+
+.autocomplete-suggestion {
+  padding: 5px 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.autocomplete-suggestion:hover {
+  background: #DDD;
+}
+
+.autocomplete-selected {
+  background: #DDD;
+}
+
+.autocomplete-suggestions strong {
+  color: #3399FF;
+}
+
+.autocomplete-group {
+  padding: 2px 5px;
+}
+
+.autocomplete-group strong {
+  display: block;
+  border-bottom: 1px solid #000;
+}
+
+/* Sticky footer styles (from http://holdirbootstrap.de/examples/sticky-footer-navbar/sticky-footer-navbar.css)
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  background-color: #f5f5f5;
+}
+
+.container .text-muted {
+  margin: 20px 0;
+}
+
+.login-panel-footer {
+  margin-top: 1em;
+}
+
+.login-panel {
+  margin-top: 2em;
+}

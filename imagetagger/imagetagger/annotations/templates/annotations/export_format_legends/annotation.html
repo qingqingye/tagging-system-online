@@ -1,0 +1,27 @@
+{% load i18n %}
+{% blocktrans %}
+    <p>Use the following placeholders to integrate specific details into your Format:</p>
+    <p><b>%%imagename:</b> name of the image</p>
+    <p><b>%%imagewidth:</b> width of the image</p>
+    <p><b>%%imageheight:</b> height of the image </p>
+    <p><b>%%imageset:</b> name of the imageset </p>
+    <p><b>%%type:</b> annotation type</p>
+    <p><b>%%veriamount:</b> the amount of verifications for the annotation</p>
+    <p><b>%%vector:</b> the annotation vector, as defined in the vector format</p>
+    <p><b>%%cx, %%relcx:</b> x-coordinate of the center of the annotation, absolute or relative value</p>
+    <p><b>%%cy, %%relcy:</b> y-coordinate of the center of the annotation, absolute or relative value</p>
+    <p><b>%%minx, %%relminx:</b> minimal x-value of the annotation, absolute or relative value</p>
+    <p><b>%%miny, %%relminy:</b> minimal y-value of the annotation, absolute or relative value</p>
+    <p><b>%%maxx, %%relmaxx:</b> maximal x-value of the annotation, absolute or relative value</p>
+    <p><b>%%maxy, %%relmaxy:</b> maximal y-value of the annotation, absolute or relative value</p>
+    <p><b>%%rad, %%relrad:</b> radius of the annotation, absolute or relative value</p>
+    <p><b>%%dia, %%reldia:</b> diameter of the annotation, absolute or relative value</p>
+    <p><b>%%width, %%relwidth:</b> width of the annotation, absolute or relative value</p>
+    <p><b>%%height, %%relheight:</b> height of the annotation, absolute or relative value</p>
+    <p><b>%%ifblurred</b> text in between this and %%endif will be displayed if the annotation is marked as blurred</p>
+    <p><b>%%ifnotblurred</b> text in between this and %%endif will be displayed if the annotation is not marked as blurred</p>
+    <p><b>%%ifconcealed</b> text in between this and %%endif will be displayed if the annotation is marked as concealed</p>
+    <p><b>%%ifnotconcealed</b> text in between this and %%endif will be displayed if the annotation is not marked as concealed</p>
+    <p><b>%%endif</b> closes an opened if. This is absolutely necessary for every if.</p>
+    <p>Note: nested ifs are not allowed!</p>
+{% endblocktrans %}

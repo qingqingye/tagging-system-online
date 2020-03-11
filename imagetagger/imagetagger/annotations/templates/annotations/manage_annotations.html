@@ -1,0 +1,155 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block navblock %}
+<li><a href='{% url 'images:view_imageset' selected_image_set.id %}'>Imageset</a></li>
+{% endblock %}
+{% block additional_js %}
+<script type="text/javascript" src="{% static 'annotations/js/manage_annotations.js' %}"></script>
+{% endblock additional_js %}
+{% block bodyblock %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Manage annotations of {% if selected_image_set.team %} <a href="{% url 'users:team' selected_image_set.team_id%}">{{selected_image_set.team.name}}</a>/{% endif %}<a href="{% url 'images:view_imageset' selected_image_set.id %}">{{selected_image_set.name}}</a></h1>
+            {% if annotations.has_other_pages %}
+                <h4>
+                    Page {{ annotations.number }} of {{ annotations.paginator.num_pages }}
+                </h4>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <form method="get" class="col-md-6">
+                    <div class="input-group annotation-filter" role="group" aria-label="annotation-filter">
+                        <select class="form-control" id="annotation-filter-select" name="filter">
+                            <option value="annotation-type" {% if filter == 'annotation-type' %} selected {% endif %}>Annotation type</option>
+                            <option value="latest-change-by" {% if filter == 'latest-change-by' %} selected {% endif %}>Latest change by ...</option>
+                            <option value="newer-than" {% if filter == 'newer-than' %} selected {% endif %}>Newer than ...</option>
+                            <option value="older-than" {% if filter == 'older-than' %} selected {% endif %}>Older than ...</option>
+                            <option value="verifications-min" {% if filter == 'verifications-min' %} selected {% endif %}>Minimum number of verifications</option>
+                            <option value="verifications-max" {% if filter == 'verifications-max' %} selected {% endif %}>Maximum number of verifications</option>
+                        </select>
+                        <input type="text" class="form-control" id="annotation-filter-input" name="value" value="{% if value is not None and value != '' %}{{ value }}{% endif %}"/>
+                        <span class="input-group-btn">
+                            <button type="submit" class="btn btn-primary">
+                                <span class="glyphicon glyphicon-filter"></span>
+                            </button>
+                            <a href="{% url 'annotations:manage_annotations' selected_image_set.id %}" class="btn btn-danger">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </a>
+                        </span>
+                    </div>
+                </form>
+                {% if delete_permission and annotation_count > 0 %}
+                <button type="button" class="btn btn-danger delete-annotations" data-toggle="modal" data-target="#deleteModal{{ tool.id }}">
+                    {% if value is None or value == '' %}
+                        Delete all annotations
+                    {% else %}
+                        Delete all filtered annotations
+                    {% endif %}
+                </button>
+                {% endif %}
+                <table class="table table-striped" width='100%'>
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Type</th>
+                            <th>Annotation</th>
+                            <th>Verifications</th>
+                            <th>Creator</th>
+                            <th>Last editor</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    {% for annotation in annotations %}
+                        <tr>
+                            <td><a href='{% url 'annotations:annotate' annotation.image.id %}'>{{ annotation.image.name }}</a></td>
+                            <td>{{ annotation.annotation_type.name }}</td>
+                            <td>{{ annotation.content | truncatechars:60}}{% if annotation.blurred %} <span id="blurred_label" class="label label-info">Blurred</span>{% endif %}{% if annotation.concealed %} <span id="concealed_label" class="label label-warning">Concealed</span>{% endif %}</td>
+                            <td>
+                                {% if annotation.verification_difference %}
+                                    {{ annotation.verification_difference }}
+                                {% else %}
+                                    0
+                                {% endif %}
+                            </td>
+                            <td>{{ annotation.user.username }}</td>
+                            <td>{{ annotation.last_editor.username }}</td>
+                            <td>
+                                <div class="btn-group" role="group" aria-label="btn-group">
+                                    <a class="btn btn-success" href='{% url 'annotations:annotate' annotation.image.id %}?edit={{ annotation.id }}'>
+                                            <span class="glyphicon glyphicon-pencil glyphicon-white" aria-hidden="true"></span>
+                                    </a>
+                                    <a class="btn btn-warning" href='{% url 'annotations:verify' annotation.id %}'>
+                                            <span class="glyphicon glyphicon-ok glyphicon-white" aria-hidden="true"></span>
+                                    </a>
+                                    <a class="btn btn-danger" href='{% url 'annotations:delete_annotation' annotation.id%}'>
+                                            <span class="glyphicon glyphicon-trash glyphicon-white" aria-hidden="true"></span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="step-links">
+                    <div class="btn-group" role="group" aria-label="btn-group">
+                        {% if annotations.has_previous %}
+                            <a class="btn btn-default" href="?page=1">&laquo; first</a>
+                            <a class="btn btn-default" href="?page={{ annotations.previous_page_number }}">previous</a>
+                        {% endif %}
+                        {% if annotations.has_other_pages %}
+                            <span class="current btn btn-default">
+                                Page {{ annotations.number }} of {{ annotations.paginator.num_pages }}
+                            </span>
+                        {% endif %}
+                        {% if annotations.has_next %}
+                            <a class="btn btn-default" href="?page={{ annotations.next_page_number }}">next</a>
+                            <a class="btn btn-default" href="?page={{ annotations.paginator.num_pages }}">last &raquo;</a>
+                        {% endif %}
+                    </div>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+{% if delete_permission and annotation_count > 0 %}
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">
+                    {% if annotation_count == 1 %}
+                        Delete {{ annotation_count }} annotation
+                    {% else %}
+                        Delete {{ annotation_count }} annotations
+                    {% endif %}
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    {% if annotation_count == 1 %}
+                        Do you really want to delete {{ annotation_count }} annotation?
+                    {% else %}
+                        Do you really wnat to delete {{ annotation_count }} annotations?
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <form method="post" action="{% url 'annotations:delete_annotations' selected_image_set.id %}">
+                        {% csrf_token %}
+                        <div class="input-group delete-annotations" role="group" aria-label="delete-annotations">
+                            <input type="hidden" name="filter" value="{{ filter }}">
+                            <input type="hidden" name="value" value="{{ value }}">
+                            <button type="submit" class="btn btn-danger">Yes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endif %}
+{% endblock %}

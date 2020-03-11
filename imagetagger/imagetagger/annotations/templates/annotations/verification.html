@@ -1,0 +1,126 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block taggerimports %}
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="{% static 'annotations/css/slider.css' %}" />
+    {% block additional_annotation_css %}
+    {% endblock additional_annotation_css %}
+{% endblock %}
+{% block additional_js %}
+<script type="text/javascript" src="{% static 'scripts/jcanvas.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'annotations/js/boundingboxes.js' %}"></script>
+<script type="text/javascript" src="{% static 'annotations/js/canvas.js' %}"></script>
+<script type="text/javascript" src="{% static 'annotations/js/verification.js' %}"></script>
+{% endblock additional_js %}
+{% block bodyblock %}
+<div class="container-fluid">
+    <div id="feedback_connection_error" class="js_feedback alert alert-danger hidden">
+        {% trans 'There was an unhandled error during the connection.' %}
+    </div>
+    <div id="no_annotations_error" class="js_feedback alert alert-danger hidden">
+        {% trans 'No annotations to verify!' %}
+    </div>
+    <div id="feedback_already_verified" class="js_feedback alert alert-warning hidden">
+        {% trans 'You verified this tag already!' %}
+    </div>
+    <div id="feedback_verify_successful" class="js_feedback alert alert-success hidden">
+        {% trans 'The annotation has been verified.' %}
+    </div>
+    <div id="feedback_update_successful" class="js_feedback alert alert-success hidden">
+        {% trans 'The annotation has been updated.' %}
+    </div>
+    <div id="feedback_last_annotation" class="js_feedback alert alert-danger hidden">
+        {% trans 'There are no more annotations in the list.' %}
+    </div>
+    <div class="row">
+        <div class="col-sm-6 col-sm-push-3">
+            <div class="wrapper">
+                <div id="image_col">
+                    <img id="image" src="{% url 'images:view_image' image.id %}" alt="Picture {{image.name}} not found!" width="100%"></br>
+                    <canvas id="image_canvas"></canvas>
+                    <div id="boundingBoxes"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3 col-sm-push-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 id="annotation-type-title" class="panel-title"></h3>
+                    <div id="labels">
+                        <span id="blurred_label" class="label label-info">Blurred</span>
+                        <span id="concealed_label" class="label label-warning">Concealed</span>
+                    </div>
+                </div>
+                <div class="panel-body" id="verification_form">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div id='concealed_p'>
+                                <input type='checkbox' id='concealed' name="concealed">
+                                <label for='concealed'>concealed (c)</label>
+                            </div>
+                            <div id='blurred_p'>
+                                <input type='checkbox' id='blurred' name="blurred">
+                                <label for='blurred'>blurred (b)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-md-offset-6 hidden-xs">
+                            <button class="btn btn-warning btn-block" type='button' id='edit_button'>
+                            <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Edit (e)</button>
+                        </div>
+                        <div class="col-md-12"><p></p></div>
+                        <div class="col-md-6">
+                            <button class="btn btn-lg btn-success btn-block" type='button' id='accept_button'>
+                                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> YAY (j)</button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-lg btn-danger btn-block" type='button' id='reject_button'>
+                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> NAY (k)</button>
+                        </div>
+                        <div class="col-md-12"><p></p></div>
+                        <div class="col-md-6">
+                            <button class="btn btn-default btn-block" type='button' id='last_button'>
+                            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span> Last (s)</button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-default btn-block" type='button' id='next_button'>
+                                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span> Next (d)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3 col-sm-pull-9">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <a href="{% url 'annotations:manage_annotations' image.image_set.id %}">
+                        <u><h3 class="panel-title">{{image.image_set.name}}</h3></u></a>
+                </div>
+                <div class="panel-body">
+                    {# these select options should get generated by the js-stuff based on the annotation types  #}
+                    <div class="input-group">
+                        <select id="annotation_type_select" class="form-control">
+                            <option value="-1" name="no filter">Filter for annotation types</option>
+                        </select>
+                        <span class="input-group-btn">
+                          <button class="btn btn-primary" id="filter_update_btn"><span class="glyphicon glyphicon-refresh"></span></button>
+                        </span>
+                    </div>
+                    <div class="slider-box">
+                        <label class="switch">
+                            <input id="filter_verified_checkbox" type="checkbox">
+                            <span class="slider round"></span>
+                        </label>
+                        <p class="slider-description">Filter already verified annotations</p>
+                    </div>
+                    <div id="annotation_list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% csrf_token %}
+<span id="image_set_id" class="hidden">{{ image.image_set.id }}</span>{# TODO: data field? #}
+<span id="annotation_id" class="hidden">{{ annotation.id }}</span>
+{% endblock %}

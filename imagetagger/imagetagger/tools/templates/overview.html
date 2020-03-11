@@ -1,0 +1,173 @@
+{% extends 'base/base.html' %}
+{% load widget_tweaks %}
+
+{% block bodyblock %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <h1>Tools</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            {% if not tools %}
+                <div class="alert alert-warning" role="alert">
+                    There are no tools uploaded yet!
+                </div>
+            {% endif %}
+            {% for tool in tools %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="btn-group pull-right">
+                                    {% if tool.id in edit_tools %}
+                                        <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#editModal{{ tool.id }}"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button>
+                                    {% endif %}
+                                    {% if tool.id in delete_tools %}
+                                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal{{ tool.id }}"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
+                                    {% endif %}
+                                </div>
+                                <h4>{% if not tool.public %}<span class="glyphicon glyphicon-lock" aria-hidden="true"></span>{% endif %}{{ tool.name }}</h4>
+                            </div>
+                            <div class="panel-body">
+                                {% if tool.team %}
+                                    <p>
+                                        <b>
+                                            Team:
+                                        </b>
+                                        <a href="{% url 'users:team' tool.team.id %}">
+                                            {{ tool.team.name }}
+                                        </a>
+                                    </p>
+                                {% endif %}
+                                {%  if tool.creator %}
+                                    <p>
+                                        <b>
+                                            Creator:
+                                        </b>
+                                        <a href="{% url 'users:user' tool.creator.id %}">
+                                            {{ tool.creator }}
+                                        </a>
+                                    </p>
+                                {% endif %}
+                                <p>{{ tool.description }}</p>
+                                    <a class="btn btn-primary pull-right" href="{% url 'tools:download' tool.id %}">
+                                        Download <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+                                    </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <p class="panel-title">
+                        Upload tool
+                    </p>
+                </div>
+                <div class="panel-body">
+                    <form method="POST" enctype="multipart/form-data" action="{% url 'tools:create' %}">
+                        {% csrf_token %}
+                        <label for="id_name"><h4>{{ form.name.label }}: </h4></label>
+                        {% render_field form.name class+='form-control' %}
+                        {% for error in form.name.errors %}
+                        <div class="alert alert-warning">{{ error }}</div>
+                        {% endfor %}
+                        <br>
+                        <label for="id_description"><h4>{{ form.description.label }}: </h4></label>
+                        {% render_field form.description class+='form-control' %}
+                        {% for error in form.description.errors %}
+                        <div class="alert alert-warning">{{ error }}</div>
+                        {% endfor %}
+                        <br>
+                        <label for="id_team"><h4>{{ form.team.label }}: </h4></label>
+                        {% render_field form.team %}
+                        {% for error in form.team.errors %}
+                        <div class="alert alert-warning">{{ error }}</div>
+                        {% endfor %}
+                        <br>
+                        <label for="id_public"><h4>{{ form.public.label }}: </h4></label>
+                        {% render_field form.public %}
+                        {% for error in form.public.errors %}
+                        <div class="alert alert-warning">{{ error }}</div>
+                        {% endfor %}
+                        <br>
+                        <label for="id_file"><h4>{{ form.file.label }}: </h4></label>
+                        {% render_field form.file %}
+                        {% for error in form.file.errors %}
+                        <div class="alert alert-warning">{{ error }}</div>
+                        {% endfor %}
+                        <br>
+                        <p>{{ tool_upload_notice | safe}}</p>
+                        <input class="btn btn-primary pull-right" type="submit" value="Upload">
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% for tool in tools %}
+    {% if tool.id in delete_tools %}
+        <!-- Modal  -->
+        <!-- stolen from https://getbootstrap.com/docs/3.3/javascript/#modals -->
+        <div class="modal fade" id="deleteModal{{ tool.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Delete {{ tool.name }}</h4>
+                    </div>
+                    <div class="modal-body">
+                        Do you really want to delete {{ tool.name }}?
+                    </div>
+                    <div class="modal-footer">
+                        <form method="POST" action="{% url 'tools:delete' tool.id %}" >
+                            {% csrf_token %}
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if tool.id in edit_tools %}
+        <!-- Modal  -->
+        <!-- stolen from https://getbootstrap.com/docs/3.3/javascript/#modals -->
+        <div class="modal fade" id="editModal{{ tool.id }}" tabindex="-1" role="dialog" aria-labelledby="editModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Edit {{ tool.name }}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" action="{% url 'tools:edit' tool.id %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <label for="id_name"><h4>Name: </h4></label>
+                            <input type="text" name="name" maxlength="100" class="form-control" required id="id_name" value="{{ tool.name }}"/>
+                            <br>
+                            <label for="id_description"><h4>Description: </h4></label>
+                            <textarea name="description" cols="40" rows="10" class="form-control" required id="id_description" value="{{ tool.description }}">{{ tool.description }}</textarea>
+                            <br>
+                            <label for="id_public"><h4>Public: </h4></label>
+                            <input type="checkbox" name="public" id="id_public" {%  if tool.public %} checked {% endif %}/>
+                            <br>
+                            <label for="id_file"><h4>File: </h4></label>
+                            {% render_field file_form.file %}
+                    </div>
+                    <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endfor %}
+{% endblock %}
