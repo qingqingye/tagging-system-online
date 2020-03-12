@@ -29,19 +29,6 @@ def export_auth(request, export_id):
     return HttpResponseForbidden('authentication denied')
 
 @login_required
-def smoke_test_case(request):
-    project_data = {}
-    sql = 'SELECT project_name,project_code FROM project'
-    cursor.execute(sql)
-    results = cursor.fetchall()
-    print (list(results))
-    for i in list(results):
-        project_data[i[0]]=i[1]
-    print (project_data)
-    return render(request, "showcase/smoke_test_case.html", {'project': project_data})
-
-
-@login_required
 def annotate(request, image_id):
     selected_image = get_object_or_404(Image, id=image_id)
     imageset_perms = selected_image.image_set.get_perms(request.user)
@@ -49,15 +36,12 @@ def annotate(request, image_id):
         set_images = selected_image.image_set.images.all().order_by('name')
         annotation_types = AnnotationType.objects.filter(active=True)  # for the dropdown option
         imageset_lock = selected_image.image_set.image_lock
-        obj_list = ['obstacle(4)',1, 2, 3]
         return render(request, 'annotations/annotate.html', {
             'selected_image': selected_image,
             'imageset_perms': imageset_perms,
             'imageset_lock': imageset_lock,
             'set_images': set_images,
             'annotation_types': annotation_types,
-            'obj_list': obj_list,
-
         })
     else:
         return redirect(reverse('images:view_imageset',args=(selected_image.image_set.id,)))

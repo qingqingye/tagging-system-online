@@ -400,7 +400,7 @@ class AnnotationType(models.Model):
         LINE = 3
         MULTI_LINE = 4
         POLYGON = 5
-
+        #this number is used in "vector_type"
     name = models.CharField(max_length=20, unique=True)
     active = models.BooleanField(default=True)
     vector_type = models.IntegerField(default=VECTOR_TYPE.BOUNDING_BOX)
