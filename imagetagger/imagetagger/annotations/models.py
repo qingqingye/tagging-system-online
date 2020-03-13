@@ -401,7 +401,11 @@ class AnnotationType(models.Model):
         MULTI_LINE = 4
         POLYGON = 5
         #this number is used in "vector_type"
-    name = models.CharField(max_length=20, unique=True)
+    name = models.CharField(max_length=100, unique=True)
+    L2code = models.CharField(max_length=100, unique=True)
+    L1name = models.CharField(max_length=100,default='undefined')
+    L1code = models.IntegerField(default='0')
+    L0 = models.CharField(max_length=100,default='undefined')
     active = models.BooleanField(default=True)
     vector_type = models.IntegerField(default=VECTOR_TYPE.BOUNDING_BOX)
     # Number of required nodes (in polygon and multiline) 0->unspecified

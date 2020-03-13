@@ -279,21 +279,30 @@ function calculateImageScale() {
     });
   }
 
-  function loadAnnotationTypeList() {
-    $.ajax(API_ANNOTATIONS_BASE_URL + 'annotation/loadannotationtypes/', {
-      type: 'GET',
-      headers: gHeaders,
-      dataType: 'json',
-      success: function (data) {
-        displayAnnotationTypeOptions(data.annotation_types);
-      },
-      error: function () {
-        displayFeedback($('#feedback_connection_error'))
-      }
-    })
+  function displayAnnotationTypeOptions_L1(annotationTypeList) {
+    // TODO: empty the options?
+    let annotationTypeFilterSelect = $('#filter_annotation_type');
+    let annotationTypeToolSelect = $('#annotation_type_L1');
+    $.each(annotationTypeList, function (key, annotationType) {
+      annotationTypeToolSelect.append($('<option/>', {
+        name: annotationType.name,
+        value: annotationType.id,
+        html: annotationType.name + ' (' + (key + 1) + ')',
+        id: 'annotation_type_' + (key + 1),
+        'data-vector-type': annotationType.vector_type,
+        'data-node-count': annotationType.node_count,
+        'data-blurred': annotationType.enable_blurred,
+        'data-concealed': annotationType.enable_concealed,
+      }));
+      annotationTypeFilterSelect.append($('<option/>', {
+        name: annotationType.name,
+        value: annotationType.id,
+        html: annotationType.name
+      }));
+    });
   }
 
-  function displayAnnotationTypeOptions(annotationTypeList) {
+    function displayAnnotationTypeOptions(annotationTypeList) {
     // TODO: empty the options?
     let annotationTypeFilterSelect = $('#filter_annotation_type');
     let annotationTypeToolSelect = $('#annotation_type_id');
@@ -314,6 +323,21 @@ function calculateImageScale() {
         html: annotationType.name
       }));
     });
+  }
+
+  function loadAnnotationTypeList() {
+    $.ajax(API_ANNOTATIONS_BASE_URL + 'annotation/loadannotationtypes/', {
+      type: 'GET',
+      headers: gHeaders,
+      dataType: 'json',
+      success: function (data) {
+        displayAnnotationTypeOptions_L1(data.annotation_types_L1);
+        displayAnnotationTypeOptions(data.annotation_types);
+      },
+      error: function () {
+        displayFeedback($('#feedback_connection_error'))
+      }
+    })
   }
 
   /**

@@ -129,17 +129,23 @@
                         {% csrf_token %}
                         <input type="hidden" name="image_id" value="{{ selected_image.id }}">
                         <p>
-                          <select id="annotation_type_id" name="selected_annotation_type" class="form-control">
-                              <option value="-1">{% trans 'Annotation Type' %}</option>
-{#                              {% for key,value in project.items %}#}
-{#                              <option value="{{ value }}" hassubinfo="true">{{ key }}</option>#}
-{#                              {% endfor %}#}
-
-                              {% for obj in obj_list %}
-                                  <option value ="{{ forloop.counter }}">{{ obj }}</option>
-                              {% endfor %}
+                          <select id="annotation_type_L0" name="selected_annotation_type_L0" class="form-control">
+                              <option value="-1">{% trans 'Tag L0' %}</option>
+                              <option value="1">Product</option>
+                              <option value="2">Color</option>
+                              <option value="3">Print</option>
+                              <option value="4">Fabric</option>
                           </select>
-
+                        </p>
+                        <p>
+                          <select id="annotation_type_L1" name="selected_annotation_type_L1" class="form-control">
+                              <option value="-1">{% trans 'Tag L1' %}</option>
+                          </select>
+                        </p>
+                        <p>
+                          <select id="annotation_type_id" name="selected_annotation_type_L2" class="form-control">
+                              <option value="-1">{% trans 'Tag L2' %}</option>
+                          </select>
                         </p>
                         <p>
                           <input type='checkbox' id='draw_annotations' name="draw_annotations" checked>

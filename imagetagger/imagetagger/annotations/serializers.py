@@ -10,6 +10,10 @@ class AnnotationTypeSerializer(ModelSerializer):
         fields = (
             'id',
             'name',
+            'L2code',
+            'L1name',
+            'L1code',
+            'L0',
             'vector_type',
             'node_count',
             'enable_concealed',
