@@ -77,6 +77,9 @@ function calculateImageScale() {
     loadAnnotateView(gImageId);
   }
 
+  /**
+   * according to annotation choosed to use different tag ways: line / box ....
+   */
   function setTool() {
     let selected_annotation = $('#annotation_type_id').children(':selected').data();
     let vector_type = selected_annotation.vectorType;
@@ -329,6 +332,7 @@ function calculateImageScale() {
     $.ajax(API_ANNOTATIONS_BASE_URL + 'annotation/loadannotationtypes/', {
       type: 'GET',
       headers: gHeaders,
+
       dataType: 'json',
       success: function (data) {
         displayAnnotationTypeOptions_L1(data.annotation_types_L1);
@@ -1333,6 +1337,7 @@ function calculateImageScale() {
       });
     });
 
+    // can use mouse to draw on the pic
     $(document).on('mousemove touchmove', handleSelection);
     $(window).on('resize', handleResize);
     window.onpopstate = function(event) {

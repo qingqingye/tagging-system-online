@@ -10,8 +10,9 @@ from django.contrib import messages
 from .models import Tool
 from .forms import ToolUploadForm, FileUploadForm
 from imagetagger.users.models import Team
+from imagetagger.annotations.models import AnnotationType
 import os
-
+import xlrd
 
 def tools_enabled(in_function):
     if not settings.TOOLS_ENABLED:
@@ -38,6 +39,21 @@ def overview(request):
         'tool_upload_notice': settings.TOOL_UPLOAD_NOTICE,
     })
 
+def readXlsx(path,sheetName):
+    AnnotationType.objects.all().delete()
+    workbook = xlrd.open_workbook(path)
+    sheet = workbook.sheet_by_name(sheetName)
+    print(sheet.ncols,sheet.nrows)
+
+    for j in range(1, sheet.nrows):
+        dictCategory = {}
+        for i in range(sheet.ncols):
+            dictCategory[sheet.cell_value(0, i)] = sheet.cell_value(j,i)
+        annotationTypeSave = AnnotationType(id=dictCategory["ID"],name=dictCategory["L2_Text"],active=True,node_count=0,
+                                            vector_type=1,enable_concealed=True,enable_blurred=True,
+                                            L0=dictCategory["Category"],L1code=dictCategory["L1_Code"],
+                                            L1name=dictCategory["L1_Text"],L2code=dictCategory["L2_Code"])
+        annotationTypeSave.save()
 
 @tools_enabled
 @login_required
@@ -60,11 +76,13 @@ def create_tool(request):
                                            request.FILES['file'].name)
             if not os.path.isdir(settings.TOOLS_PATH):
                 os.makedirs(settings.TOOLS_PATH)
-            with open(os.path.join(settings.TOOLS_PATH, tool.filename), 'wb+') as f:
+            final_dir=os.path.join(settings.TOOLS_PATH, tool.filename)
+            with open(final_dir, 'wb+') as f:
                 for chunk in request.FILES['file']:
                     f.write(chunk)
             messages.success(request, 'The tool was successfully uploaded')
             tool.save()
+            readXlsx(final_dir,"all L2 increasing")
             return redirect(reverse('tools:overview'))
 
     messages.error(request, 'There was an error with your upload. You can only upload files up to 2 MiB')

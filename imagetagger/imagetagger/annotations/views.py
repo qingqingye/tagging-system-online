@@ -21,7 +21,7 @@ from imagetagger.annotations.models import Annotation, AnnotationType, Export, \
 from imagetagger.annotations.serializers import AnnotationSerializer, AnnotationTypeSerializer
 from imagetagger.images.models import Image, ImageSet
 from imagetagger.users.models import Team
-import xlrd
+
 
 def export_auth(request, export_id):
     if request.user.is_authenticated():
@@ -29,25 +29,9 @@ def export_auth(request, export_id):
     return HttpResponseForbidden('authentication denied')
 
 
-def readXlsx(path,sheetName):
-    AnnotationType.objects.all().delete()
-    workbook = xlrd.open_workbook(path)
-    sheet = workbook.sheet_by_name(sheetName)
-    print(sheet.ncols,sheet.nrows)
-
-    for j in range(1, sheet.nrows):
-        dictCategory = {}
-        for i in range(sheet.ncols):
-            dictCategory[sheet.cell_value(0, i)] = sheet.cell_value(j,i)
-        annotationTypeSave = AnnotationType(id=dictCategory["ID"],name=dictCategory["L2_Text"],active=True,node_count=0,
-                                            vector_type=1,enable_concealed=True,enable_blurred=True,
-                                            L0=dictCategory["Category"],L1code=dictCategory["L1_Code"],
-                                            L1name=dictCategory["L1_Text"],L2code=dictCategory["L2_Code"])
-        annotationTypeSave.save()
 
 @login_required
 def annotate(request, image_id):
-    readXlsx("imagetagger/annotations/catalog.xlsx","all L2 increasing")
     selected_image = get_object_or_404(Image, id=image_id)
     imageset_perms = selected_image.image_set.get_perms(request.user)
     if 'read' in imageset_perms:
