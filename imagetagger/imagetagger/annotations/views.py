@@ -15,12 +15,12 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_200_OK, \
     HTTP_403_FORBIDDEN
 
-from imagetagger.annotations.forms import ExportFormatCreationForm, ExportFormatEditForm
-from imagetagger.annotations.models import Annotation, AnnotationType, Export, \
+from ..annotations.forms import ExportFormatCreationForm, ExportFormatEditForm
+from ..annotations.models import Annotation, AnnotationType, Export, \
     Verification, ExportFormat
-from imagetagger.annotations.serializers import AnnotationSerializer, AnnotationTypeSerializer
-from imagetagger.images.models import Image, ImageSet
-from imagetagger.users.models import Team
+from ..annotations.serializers import AnnotationSerializer, AnnotationTypeSerializer
+from ..images.models import Image, ImageSet
+from ..users.models import Team
 
 
 def export_auth(request, export_id):
@@ -36,7 +36,7 @@ def annotate(request, image_id):
     imageset_perms = selected_image.image_set.get_perms(request.user)
     if 'read' in imageset_perms:
         set_images = selected_image.image_set.images.all().order_by('name')
-        annotation_types_L1 = AnnotationType.objects.filter(active=False)
+        annotation_types_L1 = AnnotationType.objects.filter(active=True)
         annotation_types = AnnotationType.objects.filter(active=True)  # for the dropdown option
         imageset_lock = selected_image.image_set.image_lock
         return render(request, 'annotations/annotate.html', {
@@ -671,8 +671,10 @@ def load_set_annotations(request) -> Response:
 @api_view(['GET'])
 def load_annotation_types(request) -> Response:
 
-    annotation_types_L1 = AnnotationType.objects.filter(active=False)
+    annotation_types_L1 = AnnotationType.objects.filter(active=True)
     annotation_types = AnnotationType.objects.filter(active=True)
+    # for inf in annotation_types:
+    #     print(inf.L0)
     serializer = AnnotationTypeSerializer(
         annotation_types,
         many=True,
@@ -931,4 +933,3 @@ def api_blurred_concealed_annotation(request) -> Response:
     return Response({
         'detail': 'you updated the last annotation',
     }, status=HTTP_200_OK)
-
