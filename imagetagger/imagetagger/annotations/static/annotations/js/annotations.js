@@ -283,53 +283,17 @@ function calculateImageScale() {
   }
 
 
-  ////show L0 L1 L2 drop-down box content
-    function displayAnnotationTypeOptions(annotationTypeList) {
-    // TODO: empty the options?
-    var selectedOption_L0 = $("#annotation_type_L0 option:selected");
-    console.log(selectedOption_L0.val(), 'L000000',selectedOption_L0.text());
-
-    var selectedOption_L1 = $("#annotation_type_L1 option:selected");
-    console.log(selectedOption_L0.val(),  'L11111', selectedOption_L1.text());
-
+  function displayAnnotationTypeOptions_initial(annotationTypeList){
     let annotationTypeFilterSelect = $('#filter_annotation_type');
     let annotationTypeL0Select = $('#annotation_type_L0');
-    let annotationTypeL2Select = $('#annotation_type_id');
-    let annotationTypeL1Select =$('#annotation_type_L1');
-    let arrayL1=[];
     let arrayL0=[];
-
-    $.each(annotationTypeList, function (key, annotationType) {
+        $.each(annotationTypeList, function (key, annotationType) {
       if(!(arrayL0.includes(annotationType.L0))){
         arrayL0.push(annotationType.L0);
         annotationTypeL0Select.append($('<option/>', {
           name: annotationType.L0,
           value: annotationType.id,
           html: annotationType.L0,
-      }));
-        }
-
-      if (annotationType.L0 == selectedOption_L0.text()){
-        if(!(arrayL1.includes(annotationType.L1name))){
-          arrayL1.push(annotationType.L1name);
-          annotationTypeL1Select.append($('<option/>', {
-            name: annotationType.L1name,
-            value: annotationType.id,
-            html: annotationType.L1name,
-      }));
-        }
-      }
-
-      if (annotationType.L1name == selectedOption_L1.text() ){
-        annotationTypeL2Select.append($('<option/>', {
-        name: annotationType.name,
-        value: annotationType.id,
-        html: annotationType.name + ' (' + (key + 1) + ')',
-        id: 'annotation_type_' + (key + 1),
-        'data-vector-type': annotationType.vector_type,
-        'data-node-count': annotationType.node_count,
-        'data-blurred': annotationType.enable_blurred,
-        'data-concealed': annotationType.enable_concealed,
       }));
       }
 
@@ -341,19 +305,92 @@ function calculateImageScale() {
     });
   }
 
+
+  ////change  L1  drop-down box content
+    function displayAnnotationTypeOptions_L0(annotationTypeList) {
+    // TODO: empty the options?
+    let annotationTypeL1Select =$('#annotation_type_L1');
+    let arrayL1=[];
+    var selectedOption_L0 = $("#annotation_type_L0 option:selected");
+    $('#annotation_type_L1 option').not('option:first').remove();
+    $.each(annotationTypeList, function (key, annotationType) {
+      if (annotationType.L0 == selectedOption_L0.text()){
+        if(!(arrayL1.includes(annotationType.L1name))){
+          arrayL1.push(annotationType.L1name);
+          annotationTypeL1Select.append($('<option/>', {
+            name: annotationType.L1name,
+            value: annotationType.id,
+            html: annotationType.L1name,
+      }));
+        }
+      }
+    });
+  }
+
+  function  displayAnnotationTypeOptions_L1(annotationTypeList) {
+    let annotationTypeL2Select = $('#annotation_type_id');
+    var selectedOption_L1 = $("#annotation_type_L1 option:selected");
+    $('#annotation_type_id option').not('option:first').remove();
+    $.each(annotationTypeList, function (key, annotationType) {
+      if (annotationType.L1name == selectedOption_L1.text()) {
+        annotationTypeL2Select.append($('<option/>', {
+          name: annotationType.name,
+          value: annotationType.id,
+          html: annotationType.name + ' (' + (key + 1) + ')',
+          id: 'annotation_type_' + (key + 1),
+          'data-vector-type': annotationType.vector_type,
+          'data-node-count': annotationType.node_count,
+          'data-blurred': annotationType.enable_blurred,
+          'data-concealed': annotationType.enable_concealed,
+        }));
+      }
+    });
+
+  }
+
   /**
    * Handle the selection change of the drop down box and reload other drop box
    */
 
-  //加载下拉框内容
+  //initialize left drop box and L0
   function loadAnnotationTypeList() {
     $.ajax(API_ANNOTATIONS_BASE_URL + 'annotation/loadannotationtypes/', {
       type: 'GET',
       headers: gHeaders,
       dataType: 'json',
       success: function (data) {
-        displayAnnotationTypeOptions(data.annotation_types);
+        displayAnnotationTypeOptions_initial(data.annotation_types);
        // displayAnnotationTypeOptions_L1(data.annotation_types,selectedOption_L0.text())
+      },
+      error: function () {
+        displayFeedback($('#feedback_connection_error'))
+      }
+    })
+  }
+
+// click L0
+  function loadAnnotationTypeList_Click_L0() {
+    $.ajax(API_ANNOTATIONS_BASE_URL + 'annotation/loadannotationtypes/', {
+      type: 'GET',
+      headers: gHeaders,
+      dataType: 'json',
+      success: function (data) {
+        displayAnnotationTypeOptions_L0(data.annotation_types);
+      },
+      error: function () {
+        displayFeedback($('#feedback_connection_error'))
+      }
+    })
+  }
+
+//click L1
+  function loadAnnotationTypeList_Click_L1() {
+    $.ajax(API_ANNOTATIONS_BASE_URL + 'annotation/loadannotationtypes/', {
+      type: 'GET',
+      headers: gHeaders,
+      dataType: 'json',
+      success: function (data) {
+        displayAnnotationTypeOptions_L1(data.annotation_types);
       },
       error: function () {
         displayFeedback($('#feedback_connection_error'))
@@ -1291,8 +1328,8 @@ function calculateImageScale() {
     //click on L0 changes L1 ; on L1 changes L2 ; on L2 active draw bounding box
     $('#draw_annotations').on('change', handleShowAnnotationsToggle);
     $('select#annotation_type_id').on('change', handleAnnotationTypeChange);
-    $('select#annotation_type_L0').on('change',loadAnnotationTypeList);
-    $('select#annotation_type_L1').on('change',loadAnnotationTypeList);
+    $('select#annotation_type_L0').on('change',loadAnnotationTypeList_Click_L0);
+    $('select#annotation_type_L1').on('change',loadAnnotationTypeList_Click_L1);
 
     // register click events
     $(window).click(function(e) {
