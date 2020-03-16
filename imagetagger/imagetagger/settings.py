@@ -30,6 +30,19 @@ DATABASES = {
     }
 }
 
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'tagging',
+#         'USER': 'root',
+#         'PASSWORD':'123456',
+#         'HOST':'localhost',
+#         'PORT':'3306'
+#     }
+# }
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
@@ -70,7 +83,15 @@ UPLOAD_FS_GROUP = 33  # www-data on debian
 ENABLE_ZIP_DOWNLOAD = False  # If enabled, run manage.py runzipdaemon to create the zip files and keep them up to date
 
 # Test mail functionality by printing mails to console:
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST ='smtp.qq.com'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = '2433066075@qq.com'
+EMAIL_HOST_PASSWORD = 'cjmmkyntpkvcdjfa' #This is not your gmail password.
+DEFAULT_FROM_EMAIL = '2433066075@qq.com'
+EMAIL_USE_TLS = True
 TOOLS_ENABLED = True
 TOOLS_PATH = os.path.join(BASE_DIR, 'tools')
 TOOL_UPLOAD_NOTICE = ''

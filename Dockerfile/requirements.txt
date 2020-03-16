@@ -17,3 +17,7 @@ psycopg2-binary==2.8.4
 pytz==2019.3              # via django
 six==1.13.0               # via fasteners
 sqlparse==0.3.0           # via django
+xlrd==1.2.0
+Faker==4.0.2
+Pillow==7.0.0
+requests==2.18.4
