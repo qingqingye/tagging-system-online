@@ -20,4 +20,4 @@ sqlparse==0.3.0           # via django
 xlrd==1.2.0
 Faker==4.0.2
 Pillow==7.0.0
-requests==2.18.4
+requests==2.20.0
