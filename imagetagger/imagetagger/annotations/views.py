@@ -933,3 +933,18 @@ def api_blurred_concealed_annotation(request) -> Response:
     return Response({
         'detail': 'you updated the last annotation',
     }, status=HTTP_200_OK)
+
+# add new annotation type
+@login_required()
+@api_view(['POST'])
+def createType(request):
+    L2Name = request.POST.get('L2Name')
+    L2Code = request.POST.get('L2Code')
+    Id = request.POST.get('Id')
+    typeAdd = AnnotationType.objects.get(id=Id)
+    rows= len(AnnotationType.objects.all())
+    AnnotationType.objects.create(id=rows+1, name=L2Name,active=True,node_count=0,vector_type=1,enable_blurred=True, enable_concealed=True, L0=typeAdd.L0,
+                                  L1code=typeAdd.L1code,L1name=typeAdd.L1name,L2code=L2Code)
+    return redirect(reverse('annotations:annotate', args=(27,)))
+
+

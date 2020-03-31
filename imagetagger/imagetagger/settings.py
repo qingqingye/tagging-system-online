@@ -48,6 +48,8 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-us'
 
+TIME_ZONE = 'Asia/Shanghai'
+
 # TIME_ZONE = 'Europe/Berlin' #Timezone of your server
 
 # STATIC_URL = '/static/'
@@ -87,11 +89,11 @@ ENABLE_ZIP_DOWNLOAD = False  # If enabled, run manage.py runzipdaemon to create 
 
 EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST ='smtp.qq.com'
-EMAIL_PORT = 25
+EMAIL_PORT = 465
 EMAIL_HOST_USER = '2433066075@qq.com'
 EMAIL_HOST_PASSWORD = 'cjmmkyntpkvcdjfa' #This is not your gmail password.
 DEFAULT_FROM_EMAIL = '2433066075@qq.com'
-EMAIL_USE_TLS = True
+EMAIL_USE_SSL = True
 TOOLS_ENABLED = True
 TOOLS_PATH = os.path.join(BASE_DIR, 'tools')
 TOOL_UPLOAD_NOTICE = ''

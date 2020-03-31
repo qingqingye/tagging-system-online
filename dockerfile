@@ -1,4 +1,3 @@
-Dockerfile:
 FROM python:3.6
 #3.6不用声明系统是ubuntu还是Windows ，python36可以跨平台
 ENV PYTHONUNBUFFERED 1

@@ -312,6 +312,7 @@ function calculateImageScale() {
     let annotationTypeL1Select =$('#annotation_type_L1');
     let arrayL1=[];
     var selectedOption_L0 = $("#annotation_type_L0 option:selected");
+    //$('#set_L0').val(selectedOption_L0.text());
     $('#annotation_type_L1 option').not('option:first').remove();
     $.each(annotationTypeList, function (key, annotationType) {
       if (annotationType.L0 == selectedOption_L0.text()){
@@ -326,10 +327,11 @@ function calculateImageScale() {
       }
     });
   }
-
+// change L2 drop down box
   function  displayAnnotationTypeOptions_L1(annotationTypeList) {
     let annotationTypeL2Select = $('#annotation_type_id');
     var selectedOption_L1 = $("#annotation_type_L1 option:selected");
+    $('#set_Id').val(selectedOption_L1.val());
     $('#annotation_type_id option').not('option:first').remove();
     $.each(annotationTypeList, function (key, annotationType) {
       if (annotationType.L1name == selectedOption_L1.text()) {
