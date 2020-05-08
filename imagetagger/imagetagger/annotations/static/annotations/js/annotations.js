@@ -1507,36 +1507,36 @@ function calculateImageScale() {
                 case 16: // Shift
                     gShiftDown = false;
                     break;
-                case 70: //f
-                    $('#next_button').click();
-                    break;
-                case 68: //d
-                    $('#skip_button').click();
-                    break;
-                case 83: //s
-                    $('#back_button').click();
-                    break;
-                case 65: //a
-                    $('#last_button').click();
-                    break;
-                case 71: //g
-                    $('#not_in_image').click();
-                    break;
-                case 82: //r
-                    $('#reset_button').click();
-                    break;
-                case 86: //'v'
-                    $('#save_button').click();
-                    break;
-                case 46: //'DEL'
-                    handleDelete(event);
-                    break;
-                case 66: //b
-                    $('#blurred').click();
-                    break;
-                case 67: //c
-                    $('#concealed').click();
-                    break;
+                // case 70: //f
+                //     $('#next_button').click();
+                //     break;
+                // case 68: //d
+                //     $('#skip_button').click();
+                //     break;
+                // case 83: //s
+                //     $('#back_button').click();
+                //     break;
+                // case 65: //a
+                //     $('#last_button').click();
+                //     break;
+                // case 71: //g
+                //     $('#not_in_image').click();
+                //     break;
+                // case 82: //r
+                //     $('#reset_button').click();
+                //     break;
+                // case 86: //'v'
+                //     $('#save_button').click();
+                //     break;
+                // case 46: //'DEL'
+                //     handleDelete(event);
+                //     break;
+                // case 66: //b
+                //     $('#blurred').click();
+                //     break;
+                // case 67: //c
+                //     $('#concealed').click();
+                //     break;
             }
         });
         $(document).one("ajaxStop", function () {

@@ -403,7 +403,8 @@ class AnnotationType(models.Model):
         #this number is used in "vector_type"
     name = models.CharField(max_length=100, unique=True)
     L2code = models.CharField(max_length=100, unique=True)
-    L1name = models.CharField(max_length=100,default='undefined')
+    L1name = models.CharField(max_length=100, default='undefined')
+    Color = models.CharField(max_length=100, default='undefined')
     L1code = models.IntegerField(default='0')
     L0 = models.CharField(max_length=100,default='undefined')
     active = models.BooleanField(default=True)
