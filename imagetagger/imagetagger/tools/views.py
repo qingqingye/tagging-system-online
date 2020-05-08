@@ -49,10 +49,10 @@ def readXlsx(path,sheetName):
         dictCategory = {}
         for i in range(sheet.ncols):
             dictCategory[sheet.cell_value(0, i)] = sheet.cell_value(j,i)
-        annotationTypeSave = AnnotationType(id=dictCategory["Nb of subcategories"],name=dictCategory["L2_Subcategory - TEXT"],active=True,node_count=0,
+        annotationTypeSave = AnnotationType(id=dictCategory["ID"],name=dictCategory["L2_Text"],active=True,node_count=0,
                                             vector_type=1,enable_concealed=True,enable_blurred=True,
-                                            L0=dictCategory["L0"],L1code=dictCategory["L1_Category"],
-                                            L1name=dictCategory["L1_Category text"],L2code=dictCategory["L2"],Color = dictCategory["color_sub"])
+                                            L0=dictCategory["Category"],L1code=dictCategory["L1_Code"],
+                                            L1name=dictCategory["L1_Text"],L2code=dictCategory["L2_Code"])
         annotationTypeSave.save()
 
 @tools_enabled
@@ -82,7 +82,7 @@ def create_tool(request):
                     f.write(chunk)
             messages.success(request, 'The tool was successfully uploaded')
             tool.save()
-            readXlsx(final_dir,"L2 final dictionary")
+            readXlsx(final_dir,"all L2 increasing")
             return redirect(reverse('tools:overview'))
 
     messages.error(request, 'There was an error with your upload. You can only upload files up to 2 MiB')
