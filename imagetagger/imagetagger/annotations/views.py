@@ -1,5 +1,5 @@
 import datetime
-
+import json
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -68,8 +68,12 @@ def create_export(request, image_set_id):
         if request.method == 'POST' and export is not None:
             selected_format = request.POST['export_format']
             format = get_object_or_404(ExportFormat, id=selected_format)
-            export_text, annotation_count, export_filename = export_format(format, imageset)
-
+            #export_text, annotation_count, export_filename = export_format(format, imageset)
+            export_text, annotation_count, export_filename = new_export_format(imageset)
+            print(export_text,annotation_count,export_filename)
+            with open(export_filename, 'w') as file_obj:
+                json.dump(export_text, file_obj)
+            print('successfully download')
             export = Export(image_set=imageset,
                             user=request.user,
                             annotation_count=annotation_count,
@@ -80,7 +84,6 @@ def create_export(request, image_set_id):
             export.save()
 
     return redirect(reverse('images:view_imageset', args=(image_set_id,)))
-
 
 @login_required
 def download_export(request, export_id):
@@ -229,6 +232,37 @@ def apply_conditional(string, conditional, keep):
             string = string.replace(conditional + found + "%%endif", "")
     return string
 
+def new_export_format(imageset):
+    print(imageset)
+    images = Image.objects.filter(image_set=imageset)
+    file_name ='output.json'
+    output=[]
+    output_file = {}
+    for image in images:
+        annotations = Annotation.objects.filter(image=image)
+        pic_data = {}
+        pic_data['image_name'] = image.name
+        pic_data['image_id'] =image.id
+        pic_data['image_Set'] =image.image_set_id
+        pic_annotations = []
+        annotation_typeId_arr = []
+        for annotation in annotations:
+            annotation_typeId_arr.append(annotation.annotation_type_id)
+            annotation_type = AnnotationType.objects.filter(id=annotation.annotation_type_id)
+            pic_annotations.append(list(annotation_type.values())[0])
+        pic_data['annotations'] = pic_annotations
+        #print(pic_data)
+        #data[image.name] =list(annotations.values())
+            #json.loads(serializers.serialize("json", annotations))
+        output.append(pic_data)
+    print(output)
+    # with open(file_name, 'w') as f:
+    #     json.dump(output, f)
+    output_file[str(imageset)]= output
+    # with open(file_name, 'w') as file_obj:
+    #     json.dump(output, file_obj)
+    # print('successfully download')
+    return output, 2, file_name
 
 def export_format(export_format_name, imageset):
     images = Image.objects.filter(image_set=imageset)
@@ -933,3 +967,34 @@ def api_blurred_concealed_annotation(request) -> Response:
     return Response({
         'detail': 'you updated the last annotation',
     }, status=HTTP_200_OK)
+
+# add new annotation type
+@login_required()
+@api_view(['POST'])
+def createType(request,image_id):
+    print(image_id)
+    L1Flag= request.POST.get('Id')
+    L2Name = request.POST.get('L2Name')
+    L2Code = request.POST.get('L2Code')
+    print(L1Flag,'aaaaaaaaa')
+
+    if(L1Flag== "-1"):
+    # means need to add L1 category
+        Id = request.POST.get('Id_L0')
+        typeAdd = AnnotationType.objects.get(id=Id)
+        L1text = request.POST.get('L1Name')
+        print(L1text, "l1text")
+        L1num = request.POST.get('L1Code')
+        print(L1num, "l1num")
+    else:
+    # means only add L2
+        Id = request.POST.get('Id')
+        typeAdd = AnnotationType.objects.get(id=Id)
+        L1text = typeAdd.L1name
+        L1num = typeAdd.L1code
+        print(L1num,"l1num")
+
+    rows= len(AnnotationType.objects.all())
+    AnnotationType.objects.create(id=rows+1, name=L2Name,active=True,node_count=0,vector_type=1,enable_blurred=True, enable_concealed=True, L0=typeAdd.L0,
+                                  L1code=L1num,L1name=L1text,L2code=L2Code)
+    return redirect(reverse('annotations:annotate', args=(image_id,)))

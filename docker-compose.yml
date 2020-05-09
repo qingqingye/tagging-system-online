@@ -12,8 +12,8 @@ services:
     volumes:
       - /home/server/pg_data/data:/var/lib/postgresql/data/pgdata
   web:
-    image: python36:Django
-# your image you want to use
+    image: python36:djson
+# your image you want to use remember to change every time
     working_dir: /code
     command: python ./imagetagger/manage.py runserver 0.0.0.0:8000
 # This port needs to be the same of ports below.

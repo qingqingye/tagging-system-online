@@ -5,16 +5,18 @@ import os
 # Copy this file as settings.py and customise as necessary
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'FDB123456'
+SECRET_KEY = 'DEV KEY PLEASE CHANGE IN PRODUCTION INTO SOMETHING RANDOM'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 # Allowed Host headers this site can server
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['imagetagger.example.com']
 
 # Additional installed apps
-INSTALLED_APPS +=[]
+INSTALLED_APPS += [
+    # 'raven.contrib.django.raven_compat',  # uncomment if sentry is used
+]
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
@@ -23,25 +25,12 @@ DATABASES = {
     'default': {
         # Imagetagger relies on some Postgres features so other Databses will _not_ work
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': 'db',
-        'NAME': 'postgres',
-        'PASSWORD': '123456',
-        'USER': 'postgres',
+        'HOST': '127.0.0.1',
+        'NAME': 'imagetagger',
+        'PASSWORD': 'imagetagger',
+        'USER': 'imagetagger',
     }
 }
-
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'tagging',
-#         'USER': 'root',
-#         'PASSWORD':'123456',
-#         'HOST':'localhost',
-#         'PORT':'3306'
-#     }
-# }
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
@@ -83,15 +72,13 @@ UPLOAD_FS_GROUP = 33  # www-data on debian
 ENABLE_ZIP_DOWNLOAD = False  # If enabled, run manage.py runzipdaemon to create the zip files and keep them up to date
 
 # Test mail functionality by printing mails to console:
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST ='smtp.qq.com'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.sina.com'
 EMAIL_PORT = 25
-EMAIL_HOST_USER = '2433066075@qq.com'
-EMAIL_HOST_PASSWORD = 'cjmmkyntpkvcdjfa' #This is not your gmail password.
-DEFAULT_FROM_EMAIL = '2433066075@qq.com'
-EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'a_system_email@sina.com'
+EMAIL_HOST_PASSWORD = '12345ssdlh'
+
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 TOOLS_ENABLED = True
 TOOLS_PATH = os.path.join(BASE_DIR, 'tools')
 TOOL_UPLOAD_NOTICE = ''

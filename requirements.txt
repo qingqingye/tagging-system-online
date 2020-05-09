@@ -21,3 +21,5 @@ xlrd==1.2.0
 Faker==4.0.2
 Pillow==7.0.0
 requests==2.18.4
+json5==0.6.1
+jsonschema==3.0.0

@@ -23,7 +23,8 @@ DATABASES = {
     'default': {
         # Imagetagger relies on some Postgres features so other Databses will _not_ work
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': 'db',
+        'HOST': 'db'
+        #'local  use :127.0.0.1',
         'NAME': 'postgres',
         'PASSWORD': '123456',
         'USER': 'postgres',

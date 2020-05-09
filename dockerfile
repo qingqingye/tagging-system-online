@@ -1,9 +1,8 @@
-Dockerfile:
 FROM python:3.6
 #3.6不用声明系统是ubuntu还是Windows ，python36可以跨平台
 ENV PYTHONUNBUFFERED 1
-RUN apt-get update && \ DEBIAN_FRONTEND=noninteractive apt-get -yq install sqlite3 &&
-rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN sed -i "s/archive.ubuntu./mirrors.aliyun./g" /etc/apt/sources.list
+RUN sed -i "s/deb.debian.org/mirrors.aliyun.com/g" /etc/apt/sources.list
 #run后面是你要安装的东西 可以理解为在镜像里面run了这个指令
 #可以把需要安装的包全部声明在requirement.txt里面也可以 run 一个个安装
 RUN mkdir /code
