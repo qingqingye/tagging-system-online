@@ -850,14 +850,14 @@ function calculateImageScale() {
             concealedP.show();
             concealed.prop('disabled', false);
         } else {
-            concealedP.hide();
+            // concealedP.hide();
             concealed.prop('disabled', true);
         }
         if (selectedAnnotation.data('blurred')) {
             blurredP.show();
             blurred.prop('disabled', false);
         } else {
-            blurredP.hide();
+           // blurredP.hide();
             blurred.prop('disabled', true);
         }
     }
@@ -989,8 +989,8 @@ function calculateImageScale() {
 
         displayImage(imageId);
         if (!$('#keep_selection').prop('checked')) {
-            $('#concealed').prop('checked', false);
-            $('#blurred').prop('checked', false);
+            $('#concealed').prop('checked');
+            $('#blurred').prop('checked');
         }
         scrollImageList();
 

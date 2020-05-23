@@ -37,8 +37,8 @@ class Annotation(models.Model):
 
     image = models.ForeignKey(Image, on_delete=models.CASCADE, related_name='annotations')
     vector = JSONField(null=True)
-    _concealed = models.BooleanField(default=False)
-    _blurred = models.BooleanField(default=False)
+    # _concealed = models.BooleanField(default=False)
+    # _blurred = models.BooleanField(default=False)
     closed = models.BooleanField(default=False)
     time = models.DateTimeField(auto_now_add=True)
 

@@ -17,6 +17,8 @@ class Image(models.Model):
     checksum = models.BinaryField()
     width = models.IntegerField(default=800)
     height = models.IntegerField(default=600)
+    deleted = models.BooleanField(default=False)
+    gender_confusion = models.BooleanField(default=False)
 
     def path(self):
         return os.path.join(self.image_set.root_path(), self.filename)
