@@ -235,6 +235,7 @@ def apply_conditional(string, conditional, keep):
 def new_export_format(imageset):
     print(imageset)
     images = Image.objects.filter(image_set=imageset)
+    print('hhhhhh',imageset)
     file_name ='output.json'
     output=[]
     output_file = {}
@@ -242,8 +243,10 @@ def new_export_format(imageset):
         annotations = Annotation.objects.filter(image=image)
         pic_data = {}
         pic_data['image_name'] = image.name
-        pic_data['image_id'] =image.id
-        pic_data['image_Set'] =image.image_set_id
+        pic_data['image_id'] = image.id
+        imageSet_name = ImageSet.objects.filter(id = image.image_set_id)[0].name
+        pic_data['image_Set'] = imageSet_name
+        pic_data['change_gender'] = image.gender_confusion
         pic_annotations = []
         annotation_typeId_arr = []
         for annotation in annotations:
@@ -256,12 +259,8 @@ def new_export_format(imageset):
             #json.loads(serializers.serialize("json", annotations))
         output.append(pic_data)
     print(output)
-    # with open(file_name, 'w') as f:
-    #     json.dump(output, f)
     output_file[str(imageset)]= output
-    # with open(file_name, 'w') as file_obj:
-    #     json.dump(output, file_obj)
-    # print('successfully download')
+
     return output, 2, file_name
 
 def export_format(export_format_name, imageset):
@@ -583,8 +582,8 @@ def create_annotation(request) -> Response:
         image_id = int(request.data['image_id'])
         annotation_type_id = int(request.data['annotation_type_id'])
         vector = request.data['vector']
-        blurred = request.data['blurred']
-        concealed = request.data['concealed']
+        #blurred = request.data['blurred']
+        #concealed = request.data['concealed']
     except (KeyError, TypeError, ValueError):
         raise ParseError
 
@@ -628,8 +627,8 @@ def create_annotation(request) -> Response:
             image=image,
             annotation_type=annotation_type,
             user=request.user,
-            _blurred=blurred,
-            _concealed=concealed
+           # _blurred=blurred,
+           # _concealed=concealed
         )
 
         # Automatically verify for owner
@@ -998,3 +997,17 @@ def createType(request,image_id):
     AnnotationType.objects.create(id=rows+1, name=L2Name,active=True,node_count=0,vector_type=1,enable_blurred=True, enable_concealed=True, L0=typeAdd.L0,
                                   L1code=L1num,L1name=L1text,L2code=L2Code)
     return redirect(reverse('annotations:annotate', args=(image_id,)))
+
+
+@login_required
+@api_view(['POST'])
+def change_gender(request) -> Response:
+    try:
+        image_id = int(request.data['image_id'])
+    except (KeyError, TypeError, ValueError):
+        raise ParseError
+    Image.objects.filter(id=image_id).update(gender_confusion = True)
+    return Response({
+        'detail': 'gender has been changed.',
+    })
+

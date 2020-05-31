@@ -68,6 +68,10 @@
         <div id="feedback_multiline_information" class="js_feedback alert alert-info hidden">
             {% trans 'Press ESC to end the line.' %}
         </div>
+        <div id="gender_has_changed" class="js_feedback alert alert-info hidden">
+            {% trans 'Gender has been changed, are you sure to change again.' %}
+        </div>
+
         <div class="row">
             <div class="col-md-4">
                 <div class="panel panel-default">
@@ -96,7 +100,8 @@
                                 </a>
                             {% endfor %}
                         </div>
-                        <form method="post" action="{% url 'annotations:addType' selected_image.id  %}" class="form-inline">
+                        <form method="post" action="{% url 'annotations:addType' selected_image.id %}"
+                              class="form-inline">
                             {% csrf_token %}
                             &nbsp;&nbsp;
                             <input type="text" name="Id_L0" maxlength="10" placeholder="Don't fill in L0"
@@ -168,34 +173,33 @@
                                     <option value="-1">{% trans 'Tag L2' %}</option>
                                 </select>
                             </p>
-                            <p>
-                                <input type='checkbox' id='draw_annotations' name="draw_annotations" checked>
-                                <label for='draw_annotations'>Draw annotations of selected type</label>
-                            </p>
+                            {#                            <p>#}
+                            {#                                <input type='checkbox' id='draw_annotations' name="draw_annotations" checked>#}
+                            {#                                <label for='draw_annotations'>Draw annotations of selected type</label>#}
+                            {#                            </p>#}
                             {% if 'annotate' in imageset_perms %}
                                 <p>
                                     <input type='checkbox' id='keep_selection' name="keep_selection" checked>
                                     <label for='keep_selection'>Keep selection for next image</label>
                                 </p>
                                 <hr>
-                                <p>
-                                    <input type='checkbox' name='not_in_image' id='not_in_image'>
-                                    <label for='not_in_image'>Not in the image (g)</label>
-                                </p>
-                                <p id='concealed_p'>
-                                    <input type='checkbox' id='concealed' name="concealed">
-                                    <label for='concealed'>concealed (c)</label>
-                                </p>
+                                {#                                <p>#}
+                                {#                                    <input type='checkbox' name='not_in_image' id='not_in_image'>#}
+                                {#                                    <label for='not_in_image'>Not in the image (g)</label>#}
+                                {#                                </p>#}
+                                {#                                <p id='concealed_p'>#}
+                                {#                                    <input type='checkbox' id='concealed' name="concealed">#}
+                                {#                                    <label for='concealed'>delete this image</label>#}
+                                {#                                </p>#}
                                 <p id='blurred_p'>
                                     <input type='checkbox' id='blurred' name="blurred">
-                                    <label for='blurred'>blurred (b)</label>
+                                    <label for='blurred'>change gender</label>
                                 </p>
                                 <p data-toggle="tooltip" data-placement="right"
                                    title="Same layout as the arrow keys. Increasing the bounding box size is possible with shift+i/l . Decreasing is possible with shift+j/k .">
                                     The bounding box can be moved<b> and resized</b> with <b>i j k l</b> <span
                                         class="glyphicon glyphicon-question-sign"></span></p>
-                                <div class="row" id="coordinate_table">
-                                </div>
+
                             {% endif %}
                             <br>
                             <div class="row ">
@@ -215,37 +219,36 @@
                                         </button>
                                     </div>
                                     <div class="col-sm-12"><p></p></div>
-                                    <div class="col-md-6">
-                                        <button type="button" class="annotate_button btn btn-default btn-block"
-                                                id="last_button">
-                                            <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
-                                            <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span>Last
-                                            (a)
-                                        </button>
-                                    </div>
+                                    {#                                    <div class="col-md-6">#}
+                                    {#                                        <button type="button" class="annotate_button btn btn-default btn-block"#}
+                                    {#                                                id="last_button">#}
+                                    {#                                            <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>#}
+                                    {#                                            <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span>Last#}
+                                    {#                                            (a)#}
+                                    {#                                        </button>#}
+                                    {#                                    </div>#}
                                     <div class="col-md-6">
                                         <button type="button" class="annotate_button btn btn-default btn-block"
                                                 id="back_button">
-                                            <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>Back
-                                            (s)
+                                            <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>Last
+                                            Pic
                                         </button>
                                     </div>
-                                    <div class="col-sm-12"><p></p></div>
+                                    {#                                    <div class="col-sm-12"><p></p></div>#}
                                     <div class="col-md-6">
                                         <button type="button" class="annotate_button btn btn-default btn-block"
                                                 id="skip_button">
-                                            <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>Skip
-                                            (d)
+                                            <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>Next Pic
                                         </button>
                                     </div>
-                                    <div class="col-md-6">
-                                        <button type="button" class="annotate_button btn btn-default btn-block"
-                                                id="next_button">
-                                            <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
-                                            <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span>Next
-                                            (f)
-                                        </button>
-                                    </div>
+                                    {#                                    <div class="col-md-6">#}
+                                    {#                                        <button type="button" class="annotate_button btn btn-default btn-block"#}
+                                    {#                                                id="next_button">#}
+                                    {#                                            <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>#}
+                                    {#                                            <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span>Next#}
+                                    {#                                            (f)#}
+                                    {#                                        </button>#}
+                                    {#                                    </div>#}
                                 {% else %}
                                     <div class="col-md-6">
                                         <button type="button" class="annotate_button btn btn-default btn-block"
@@ -264,11 +267,19 @@
                                 {% endif %}
                                 {% if 'delete_images' in imageset_perms and not imageset_lock %}
                                     <div class="col-sm-12"><p></p></div>
-                                    <div class="col-md-12">
+                                    <div class="col-md-6">
                                         <button type="button" class="btn btn-danger" id="delete-button"
                                                 data-toggle="modal" data-target="#deleteModal" style="width: 100%">
                                             <span class="glyphicon glyphicon-trash" aria-hidden="true"
                                                   style="padding-right: 3px;"></span>Remove image from imageset
+                                        </button>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <button type="button" class="btn btn-danger" id="gender-button"
+                                                style="width: 100%">
+                                            <span class="glyphicon glyphicon-trash" aria-hidden="true"
+                                                  style="padding-right: 3px;"></span>Change gender
                                         </button>
                                     </div>
                                 {% endif %}
@@ -276,6 +287,7 @@
                         </form>
                     </div>
                 </div>
+                <div class="row" id="coordinate_table"></div>
             </div>
         </div>
     </div>
