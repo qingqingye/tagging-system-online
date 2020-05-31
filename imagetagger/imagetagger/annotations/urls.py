@@ -28,4 +28,5 @@ urlpatterns = [
     url(r'^api/annotation/update/$', views.update_annotation, name='update_annotations'),
     url(r'^api/annotation/blurred_concealed/$', views.api_blurred_concealed_annotation, name='blurred_concealed_annotation'),
     url(r'api/annotation/(\d+)/createType/$', views.createType, name='addType'),
+    url(r'^api/annotation/gender/$', views.change_gender,name='change_gender'),
 ]

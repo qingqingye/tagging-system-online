@@ -174,6 +174,35 @@ function calculateImageScale() {
     }
 
     /**
+     *if the pic need to be deleted and change gnder make a flag in image info
+     *
+     */
+    function changeGender() {
+        if (event !== undefined) {
+            // triggered using an event handler
+            event.preventDefault();}
+            if ($('#blurred').prop('checked')) {
+                displayFeedback($('#gender_has_changed'));
+                return;
+            }
+            var data = {
+            image_id: gImageId,
+            };
+            $.ajax(API_ANNOTATIONS_BASE_URL + 'annotation/' + 'gender' + '/', {
+            type: 'POST',
+            headers: gHeaders,
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function () {
+                blurred.checked = true;
+            },
+                error: function () {
+                displayFeedback($('#feedback_connection_error'));
+            }
+            });
+    }
+
+    /**
      * Create an annotation using the form data from the current page.
      * If an annotation is currently edited, an update is triggered instead.
      *
@@ -622,8 +651,8 @@ function calculateImageScale() {
      * @param imageId
      */
     function displayImage(imageId) {
+        blurred.checked = false;
         imageId = parseInt(imageId);
-
         if (gImageList.indexOf(imageId) === -1) {
             console.log(
                 'skiping request to load image ' + imageId +
@@ -850,15 +879,15 @@ function calculateImageScale() {
             concealedP.show();
             concealed.prop('disabled', false);
         } else {
-            concealedP.hide();
-            concealed.prop('disabled', true);
+            // concealedP.hide();
+            //concealed.prop('disabled', true);
         }
         if (selectedAnnotation.data('blurred')) {
             blurredP.show();
             blurred.prop('disabled', false);
         } else {
-            blurredP.hide();
-            blurred.prop('disabled', true);
+           // blurredP.hide();
+           // blurred.prop('disabled', true);
         }
     }
 
@@ -989,8 +1018,8 @@ function calculateImageScale() {
 
         displayImage(imageId);
         if (!$('#keep_selection').prop('checked')) {
-            $('#concealed').prop('checked', false);
-            $('#blurred').prop('checked', false);
+            $('#concealed').prop('checked');
+            $('#blurred').prop('checked');
         }
         scrollImageList();
 
@@ -1363,6 +1392,7 @@ function calculateImageScale() {
             tool.resetSelection(true);
         });
         $('#save_button').click(createAnnotation);
+        $('#gender-button').click(changeGender);
         $('#reset_button').click(function () {
             tool.resetSelection(true);
         });
@@ -1376,6 +1406,7 @@ function calculateImageScale() {
             }
         });
         $('#back_button').click(function (event) {
+            //blurred.checked = False;
             event.preventDefault();
             if (tool instanceof BoundingBoxes) {
                 tool.cancelSelection();
