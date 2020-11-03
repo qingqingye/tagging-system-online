@@ -33,6 +33,7 @@ from imagetagger.annotations.models import Annotation, Export, ExportFormat, \
 from imagetagger.tagger_messages.models import Message, TeamMessage, GlobalMessage
 
 import os
+import requests
 import shutil
 import string
 import random
@@ -40,8 +41,11 @@ import zipfile
 import hashlib
 import json
 import imghdr
+import xlrd
+import csv
+import re
 from datetime import date, timedelta
-
+ALIYUN_OSS_PREFIX = "http://fdb-tagging.oss-cn-shanghai.aliyuncs.com"
 
 @login_required
 def explore_imageset(request):
@@ -173,6 +177,14 @@ def index(request):
 @login_required
 @require_http_methods(["POST", ])
 def upload_image(request, imageset_id):
+    error = {
+        'duplicates': 0,
+        'damaged': False,
+        'directories': False,
+        'exists': False,
+        'unsupported': False,
+        'zip': False,
+    }
     imageset = get_object_or_404(ImageSet, id=imageset_id)
     if request.method == 'POST' \
             and imageset.has_perm('edit_set', request.user) \
@@ -181,14 +193,78 @@ def upload_image(request, imageset_id):
             return HttpResponseBadRequest('Must have files attached!')
         json_files = []
         for f in request.FILES.getlist('files[]'):
-            error = {
-                'duplicates': 0,
-                'damaged': False,
-                'directories': False,
-                'exists': False,
-                'unsupported': False,
-                'zip': False,
-            }
+            if "{}".format(f).endswith('.csv'):
+                json_files.append("{}".format(f))
+                file_path_xlsx = os.path.join(imageset.root_path(), 'tmp', f.name)
+                if not os.path.exists(os.path.join(imageset.root_path(), 'tmp')):
+                    os.makedirs(os.path.join(imageset.root_path(), 'tmp'))
+                with open(file_path_xlsx, 'wb') as out:
+                    for chunk in f.chunks():
+                        out.write(chunk)
+                    out.flush()
+                    out.close()
+
+                x1 = csv.reader(open(file_path_xlsx, "r"))
+                for row in x1:
+                    if row == ['', '', '', '', '']:
+                        break
+                    print(row,"row")
+                    uri = row[2]
+                    name = row[1]
+                    s = '*\/:?"<>|'
+                    obj_name = re.findall(r'[^\*"/:?\\|<>]', name, re.S)
+                    obj_name = "".join(obj_name)
+                    print(obj_name)
+                    url = ALIYUN_OSS_PREFIX + uri
+                    print(url)
+                    try :
+                        resp = requests.get(url)
+                        data = resp.content
+                    except:
+                        continue
+                    tmp_data_file_path = os.path.join(imageset.root_path(), 'tmp', obj_name)
+                    if not os.path.exists(os.path.join(imageset.root_path(), 'tmp')):
+                        os.makedirs(os.path.join(imageset.root_path(), 'tmp'))
+                    print(tmp_data_file_path,"address")
+                    with open(tmp_data_file_path, "wb") as f_img:
+                        f_img.write(data)
+                        f_img.close()
+
+                    fchecksum = hashlib.sha512()
+                    with open(tmp_data_file_path, 'rb') as f_img:
+                        while True:
+                            buf = f_img.read(10000)
+                            if not buf:
+                                break
+                            fchecksum.update(buf)
+                    fchecksum = fchecksum.digest()
+                    (shortname, extension) = os.path.splitext(obj_name)
+                    img_fname = (''.join(shortname) + '_' +
+                                 ''.join(
+                                     random.choice(
+                                         string.ascii_uppercase + string.ascii_lowercase + string.digits)
+                                     for _ in range(6)) + extension)
+                    try:
+                        with PIL_Image.open(tmp_data_file_path) as image:
+                            width, height = image.size
+                        file_new_path = os.path.join(imageset.root_path(), img_fname)
+                        shutil.move(tmp_data_file_path, file_new_path)
+                        # shutil.chown(file_new_path, group=settings.UPLOAD_FS_GROUP)
+                        new_image = Image(name=obj_name,
+                                          image_set=imageset,
+                                          filename=img_fname,
+                                          checksum=fchecksum,
+                                          width=width,
+                                          height=height
+                                          )
+                        new_image.save()
+                    except (OSError, IOError):
+                        error['damaged'] = True
+                        os.remove(tmp_data_file_path)
+                return JsonResponse({'files': json_files})
+            else:
+                pass
+
             magic_number = f.read(4)
             f.seek(0)  # reset file cursor to the beginning of the file
             if magic_number == b'PK\x03\x04':  # ZIP file magic number
